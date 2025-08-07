@@ -1,7 +1,8 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
 
@@ -11,7 +12,19 @@ public class GameManager : MonoBehaviour
     {
         public int x;
         public int y;
+        public PlayerType playerType;
     }
+
+    public enum PlayerType
+    {
+        Cross,
+        Circle,
+        None,
+    }
+
+    private PlayerType currentPlayablePlayerType;
+
+    private PlayerType localPlayerType;
 
     private void Awake()
     {
@@ -22,10 +35,55 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
-    public void ClickedOnGridPosition(int x, int y)
+    [Rpc(SendTo.Server)]
+    public void ClickedOnGridPositionRpc(int x, int y, PlayerType playerType)
     {
-        Debug.Log("ClickedOnGridPosition " + x + " " + y);
+        if (playerType != currentPlayablePlayerType)
+        {
+            return;
+        }
 
-        OnClickedOnGridPosition?.Invoke(this, new OnClickedOnGridPositionArgs { x = x, y = y });
+        OnClickedOnGridPosition?.Invoke(
+            this,
+            new OnClickedOnGridPositionArgs
+            {
+                x = x,
+                y = y,
+                playerType = playerType,
+            }
+        );
+
+        switch (currentPlayablePlayerType)
+        {
+            default:
+            case PlayerType.Cross:
+                currentPlayablePlayerType = PlayerType.Circle;
+                break;
+            case PlayerType.Circle:
+                currentPlayablePlayerType = PlayerType.Cross;
+                break;
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (NetworkManager.Singleton.LocalClientId == 0)
+        {
+            localPlayerType = PlayerType.Cross;
+        }
+        else
+        {
+            localPlayerType = PlayerType.Circle;
+        }
+
+        if (IsServer)
+        {
+            currentPlayablePlayerType = PlayerType.Cross;
+        }
+    }
+
+    public PlayerType GetLocalPlayerType()
+    {
+        return localPlayerType;
     }
 }

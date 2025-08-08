@@ -2089,6 +2089,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   crossPrefab: {fileID: 4857194205200150615, guid: 3a581362d61052a47b805cf59fa77dff, type: 3}
   circlePrefab: {fileID: 4857194205200150615, guid: e5f2ea3444631ec4e9b54d1ae2c901b5, type: 3}
+  lineCompletePrefab: {fileID: 2595080704939153698, guid: 6da17769b07c21143a17b998f8271b77, type: 3}
 --- !u!114 &1013502845
 MonoBehaviour:
   m_ObjectHideFlags: 0

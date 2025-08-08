@@ -50,6 +50,7 @@
     <Compile Include="Assets\Scripts\NetworkManagerUI.cs" />
     <Compile Include="Assets\Scripts\GridPosition.cs" />
     <Compile Include="Assets\Scripts\PlayerUI.cs" />
+    <Compile Include="Assets\Scripts\GameOverUI.cs" />
     <Compile Include="Assets\Scripts\GameVisualManager.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
   </ItemGroup>

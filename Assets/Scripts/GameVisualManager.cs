@@ -26,6 +26,12 @@ public class GameVisualManager : NetworkBehaviour
 
     private void GameManager_OnGameWin(object sender, GameManager.OnGameWinArgs e)
     {
+        // Only server can spawn the line
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
         float eulerZ = 0f;
 
         switch (e.line.orientation)

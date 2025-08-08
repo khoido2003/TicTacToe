@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,14 +15,33 @@ public class GameVisualManager : NetworkBehaviour
     private Transform lineCompletePrefab;
 
     private const float GRID_SIZE = 0.5f;
+    private List<GameObject> visualGameObjectList;
 
-    private void Awake() { }
+    private void Awake()
+    {
+        visualGameObjectList = new();
+    }
 
     private void Start()
     {
         GameManager.Instance.OnClickedOnGridPosition += GameManager_OnClickedOnGridPosition;
 
         GameManager.Instance.OnGameWin += GameManager_OnGameWin;
+
+        GameManager.Instance.OnRematch += GameManager_OnRematch;
+    }
+
+    private void GameManager_OnRematch(object sender, EventArgs e)
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+        foreach (GameObject visualGameObject in visualGameObjectList)
+        {
+            Destroy(visualGameObject);
+        }
+        visualGameObjectList.Clear();
     }
 
     private void GameManager_OnGameWin(object sender, GameManager.OnGameWinArgs e)
@@ -60,6 +80,8 @@ public class GameVisualManager : NetworkBehaviour
         );
 
         lineCompleteTransform.GetComponent<NetworkObject>().Spawn(true);
+
+        visualGameObjectList.Add(lineCompleteTransform.gameObject);
     }
 
     private void GameManager_OnClickedOnGridPosition(
@@ -101,6 +123,8 @@ public class GameVisualManager : NetworkBehaviour
         );
 
         spawnedTransform.GetComponent<NetworkObject>().Spawn(true);
+
+        visualGameObjectList.Add(spawnedTransform.gameObject);
     }
 
     private Vector2 GetGridWorldPosition(int row, int col)

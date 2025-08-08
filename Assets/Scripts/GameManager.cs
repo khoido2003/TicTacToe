@@ -10,6 +10,7 @@ public class GameManager : NetworkBehaviour
 
     private PlayerType[,] playerTypeArray;
 
+    public event EventHandler OnRematch;
     public event EventHandler OnGameStarted;
     public event EventHandler OnCurrentPlayablePlayerTypeChanged;
 
@@ -341,5 +342,27 @@ public class GameManager : NetworkBehaviour
     public PlayerType GetCurrentPlayablePlayerType()
     {
         return currentPlayablePlayerType.Value;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void RematchRpc()
+    {
+        for (int x = 0; x < playerTypeArray.GetLength(0); x++)
+        {
+            for (int y = 0; y < playerTypeArray.GetLength(1); y++)
+            {
+                playerTypeArray[x, y] = PlayerType.None;
+            }
+        }
+        currentPlayablePlayerType.Value = PlayerType.Cross;
+        OnRematch?.Invoke(this, EventArgs.Empty);
+
+        TriggerOnRematchRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TriggerOnRematchRpc()
+    {
+        OnRematch?.Invoke(this, EventArgs.Empty);
     }
 }
